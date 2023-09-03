@@ -1,0 +1,13 @@
+<head>
+    <title>Homepage</title>
+</head>
+{% extends "layout.html" %}
+{% block content %}
+
+    <h1>Items</h1>
+        <form method="post" action="/create_stream">
+            <input type="text" name="title" placeholder="Stream's title">
+            <button type="submit">Create stream</button>
+        </form>
+
+{% endblock content %}
