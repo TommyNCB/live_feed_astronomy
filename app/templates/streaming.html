@@ -1,0 +1,11 @@
+<head>
+    <title>Streaming!</title>
+</head>
+{% extends "layout.html" %}
+{% block content %}
+<h1>NOW STREAMING...</h1>
+<form action="/stop_recording" method="post">
+    <input type="submit" value="Stop Recording">
+</form>
+<img src="{{ url_for('video_feed') }}" width="300px" height="260px">
+{% endblock content %}  
