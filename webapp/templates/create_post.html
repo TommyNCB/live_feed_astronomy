@@ -1,0 +1,98 @@
+<head>
+    <title>GIRITO - Crear Publicación</title>
+</head>
+
+{% extends "layout.html" %}
+{% block content %}
+<div class="container">
+    <div class="column">
+        <h2 style="margin-bottom: 40px;"><b>Nueva Publicación</b></h2>
+        <div class="form-group">
+            <form method="POST" action="/create_post" id="insert_post_form" enctype="multipart/form-data" novalidate onsubmit="return validateForm()">
+                <div>
+                    <label class="form-label" for="title">Título</label>
+                    <input class="form-control" type="text" id="title" name="title" required>
+                    <small id="titleError" class="text-danger"></small>
+                </div>
+                <div style="margin-top: 10px;">
+                    <label class="form-label" for="summary">Descripción</label>
+                    <textarea class="form-control" aria-label="With textarea" rows="5" cols="40" type="text" id="summary" name="summary" style="resize: none;"></textarea>
+                    <small id="summaryError" class="text-danger"></small>
+                </div>
+                <div class="custom-file">
+                    <input type="file" name="attachment" id="attachment" class="custom-file-input" id="inputGroupFile01" onchange="displayFileName(this)">
+                    <label class="custom-file-label" for="inputGroupFile01">Elija un Archivo</label>
+                    <small id="fileError" class="text-danger"></small>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-dark" style="background-color: #781C3C; color: #ffffff; margin-top: 40px;">   
+                        Crear Publicación
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function displayFileName(input) {
+      const label = input.nextElementSibling;
+      if (input.files.length > 0) {
+        label.innerHTML = input.files[0].name;
+      } else {
+        label.innerHTML = "Elija un Archivo";
+      }
+    }
+  
+    function validateForm() {
+      // Reset previous error messages
+      document.getElementById("titleError").textContent = "";
+      document.getElementById("summaryError").textContent = "";
+      document.getElementById("fileError").textContent = "";
+  
+      // Get the form inputs
+      const title = document.getElementById("title").value.trim();
+      const summary = document.getElementById("summary").value.trim();
+      const attachment = document.getElementById("attachment");
+  
+      let isValid = true;
+  
+      // Validate title (required)
+      if (title === "") {
+        document.getElementById("titleError").textContent = "El título es requerido.";
+        isValid = false;
+      }
+  
+      // Validate summary (required)
+      if (summary === "") {
+        document.getElementById("summaryError").textContent = "La descripción es requerida.";
+        isValid = false;
+      }
+  
+      // Validate file (required and allowed extensions)
+      if (!attachment.files[0]) {
+        document.getElementById("fileError").textContent = "Por favor, seleccione un archivo.";
+        isValid = false;
+      } else {
+        const allowedExtensions = [".mp4", ".png"];
+        const fileName = attachment.files[0].name;
+        const fileExtension = fileName.slice(((fileName.lastIndexOf(".") - 1) >>> 0) + 2).toLowerCase();
+  
+        if (!allowedExtensions.includes("." + fileExtension)) {
+          document.getElementById("fileError").textContent = "Solo se permiten archivos .mp4 y .png.";
+          isValid = false;
+        }
+      }
+  
+      return isValid;
+    }
+    
+    document.getElementById("insert_post_form").onsubmit = function (event) {
+      if (!validateForm()) {
+        event.preventDefault(); // Prevent form submission if validation fails
+      }
+    };
+    </script>
+  
+
+{% endblock content %}

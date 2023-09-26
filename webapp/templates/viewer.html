@@ -1,0 +1,57 @@
+<head>
+    <title>GIRITO - Transmisión</title>
+</head>
+
+{% extends "layout.html" %}
+{% block content %}
+
+<video id="remote" autoplay></video>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+
+<script>
+    const remoteVideo = document.getElementById("remote");
+
+const socket = io.connect('https://' + document.domain + ':' + location.port);
+
+socket.on('connect', () => {
+    console.log('Connected to the server.');
+});
+
+socket.on('view_video', data => {
+    console.log('Received video data:', data);
+
+    if (data && data.stream) {
+        // Convert the base64-encoded stream data back to a Blob
+        const blobData = dataURLtoBlob(data.stream);
+
+        // Create a MediaStream from the Blob
+        const mediaStream = new MediaStream([blobData]);
+
+        // Set the MediaStream as the srcObject of the video element
+        remoteVideo.srcObject = mediaStream;
+
+        // Play the video
+        remoteVideo.play();
+    } else {
+        console.error('No stream data received.');
+    }
+});
+
+// Function to convert a base64-encoded data URL to a Blob
+function dataURLtoBlob(dataURL) {
+    const parts = dataURL.split(',');
+    const contentType = parts[0].split(':')[1];
+    const byteString = atob(parts[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
+
+    for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+    }
+
+    return new Blob([arrayBuffer], { type: contentType });
+}
+
+</script>
+
+{% endblock content %}  

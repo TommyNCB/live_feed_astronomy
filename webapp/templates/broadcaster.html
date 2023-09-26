@@ -1,0 +1,71 @@
+<head>
+    <title>GIRITO - Transmisión</title>
+</head>
+
+{% extends "layout.html" %}
+{% block content %}
+
+<video id="local" autoplay></video>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+
+<script>
+    const localVideo = document.getElementById("local");
+    
+    // Define the streamToBase64 function
+function streamToBase64(stream) {
+    // Capture the video track from the MediaStream
+    const videoTrack = stream.getVideoTracks()[0];
+
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = function () {
+            resolve(reader.result.split(',')[1]); // Extract the base64 data part
+        };
+
+        reader.onerror = reject;
+
+        // Create a MediaStream containing only the video track
+        const videoStream = new MediaStream([videoTrack]);
+
+        // Create a canvas element and draw the video frame on it
+        const videoElement = document.createElement('video');
+        videoElement.srcObject = videoStream;
+
+        videoElement.onloadedmetadata = function () {
+            const canvas = document.createElement('canvas');
+            canvas.width = videoElement.videoWidth;
+            canvas.height = videoElement.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas content to a Blob
+            canvas.toBlob(function (blob) {
+                reader.readAsDataURL(blob);
+            }, 'image/jpeg'); // Specify the desired MIME type (e.g., 'image/jpeg')
+        };
+    });
+}
+
+// Capture the camera stream and send it over WebSocket
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+        localVideo.srcObject = stream;
+        console.log('Camera access successful.');
+
+        // Convert the stream to a base64-encoded string
+        return streamToBase64(stream);
+    })
+    .then(streamData => {
+        const socket = io.connect('https://' + document.domain + ':' + location.port);
+        socket.emit('broadcast_video', { stream: streamData });
+    })
+    .catch(error => {
+        console.error('Error accessing camera: ', error);
+    });
+
+
+
+</script>
+
+{% endblock content %}  

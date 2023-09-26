@@ -1,0 +1,44 @@
+<head>
+    <title>GIRITO - Modificar Publicación</title>
+</head>
+
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+    <div class="column">
+        <h2 style="margin-bottom: 40px;"><b>Modificar Publicación</b></h2>
+        <div>
+            <form method="POST" action="{{ url_for('post.edit_post', post_id=post_id)}}" id="edit_post_form" enctype="multipart/form-data">
+                <div>
+                    <label class="form-label" text=title for="title">Título</label>
+                    <input class="form-control" type="text" id="title" name="title" value="{{ ind_post['title'] }}">
+                </div>
+                <div style="margin-top: 10px;">
+                    <label class="form-label" for="summary" >Descripción</label>
+                    <textarea class="form-control" aria-label="With textarea" rows="5" cols="40" type="text" id="summary" name="summary" style="resize: none;">{{ ind_post['summary'] }}</textarea>                
+                </div>
+                <div class="custom-file">
+                    <input type="file" name="attachment" id="attachment" class="custom-file-input" id="inputGroupFile01" onchange="displayFileName(this)">
+                    <label class="custom-file-label" for="inputGroupFile01">Elija un Archivo</label>
+                </div>
+                <button type="submit" class="btn btn-dark" style="background-color: #781C3C; color: #ffffff; margin-top: 20px;">   
+                    Modificar Publicación
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+                  
+<script>
+  function displayFileName(input) {
+    const label = input.nextElementSibling;
+    if (input.files.length > 0) {
+      label.innerHTML = input.files[0].name;
+    } else {
+      label.innerHTML = "Elija un Archivo";
+    }
+  }
+</script>
+
+{% endblock content %}
